@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,7 +16,7 @@ export class UsersService {
     });
     if (
       !findedUser ||
-      !this.cryptoService.verify(password, findedUser.hashedPassword)
+      !(await this.cryptoService.verify(password, findedUser.hashedPassword))
     )
       throw new BadRequestException({
         message: 'Credenciales inválidas',
