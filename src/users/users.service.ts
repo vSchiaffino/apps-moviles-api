@@ -15,7 +15,7 @@ export class UsersService {
     });
     if (
       !findedUser ||
-      !this.cryptoService.verify(password, findedUser.hashedPassword)
+      !(await this.cryptoService.verify(password, findedUser.hashedPassword))
     )
       throw new BadRequestException({
         message: 'Credenciales inválidas',
