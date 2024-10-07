@@ -29,11 +29,9 @@ export class UsersService {
   }
 
   public async findUnique(user: string, mail: string) {
-    return User.createQueryBuilder()
-      .where('user = :user OR mail = :mail', {
-        user,
-        mail,
-      })
+    return User.createQueryBuilder('user')
+      .where('user.user = :user', { user })
+      .orWhere('user.mail = :mail', { mail })
       .getOne();
   }
 

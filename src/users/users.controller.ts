@@ -10,11 +10,15 @@ export class UsersController {
   private async validateUser(userDto: CreateUserDto) {
     const { mail, user } = userDto;
     const conflictingUser = await this.userService.findUnique(user, mail);
-    if (!!conflictingUser) {
-      const conflictigField = conflictingUser.mail === mail ? 'mail' : 'user';
+    if (conflictingUser) {
+      const conflictingField = conflictingUser.mail === mail ? 'mail' : 'user';
+      const fieldNamesByfield = {
+        mail: 'mail',
+        user: 'usuario',
+      };
       throw new BadRequestException({
-        field: conflictigField,
-        message: `El ${conflictigField} ya está registrado.`,
+        field: conflictingField,
+        message: `El ${fieldNamesByfield[conflictingField]} ya está registrado.`,
       });
     }
   }
