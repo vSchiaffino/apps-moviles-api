@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { hash, compare } from 'bcrypt';
+import { hash, compare } from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
 
 export type JwtPayload = {
