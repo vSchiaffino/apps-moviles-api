@@ -26,7 +26,9 @@ export class UsersController {
   @Post()
   public async createUser(@Body() createUserDto: CreateUserDto) {
     await this.validateUser(createUserDto);
-    return await this.userService.create(createUserDto);
+    const createdUser = await this.userService.create(createUserDto);
+    const { hashedPassword, ...user } = createdUser;
+    return user;
   }
 
   @Post('/login')
