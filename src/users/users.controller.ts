@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { Body, ConflictException, Controller, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -16,7 +16,7 @@ export class UsersController {
         mail: 'mail',
         user: 'usuario',
       };
-      throw new BadRequestException({
+      throw new ConflictException({
         field: conflictingField,
         message: `El ${fieldNamesByfield[conflictingField]} ya está registrado.`,
       });
