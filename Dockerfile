@@ -31,4 +31,4 @@ FROM node:22.8.0-alpine AS production
 COPY  --from=build /usr/src/app/node_modules ./node_modules
 COPY  --from=build /usr/src/app/dist ./dist
 
-CMD ["sh", "-c", "npm run typeorm:migrate && node dist/main.js"]
+CMD [ "node", "dist/main.js" ]
