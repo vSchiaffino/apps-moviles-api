@@ -5,6 +5,7 @@ import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 
+//TODO: auth
 @Crud({
   model: {
     type: Product,
