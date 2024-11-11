@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
+import { WarehouseStock } from 'src/warehouses/entities/warehouse-stock.entity';
 
 @Entity()
 export class Product extends BaseEntity {
@@ -7,4 +14,7 @@ export class Product extends BaseEntity {
 
   @Column()
   name: string;
+
+  @OneToMany(() => WarehouseStock, (warehouseStock) => warehouseStock.product)
+  storedIn: WarehouseStock[];
 }

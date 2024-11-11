@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { WarehouseStock } from './warehouse-stock.entity';
 
 @Entity()
 export class Warehouse extends BaseEntity {
@@ -10,4 +17,7 @@ export class Warehouse extends BaseEntity {
 
   @Column()
   capacity: number;
+
+  @OneToMany(() => WarehouseStock, (warehouseStock) => warehouseStock.warehouse, { eager: true })
+  stock: WarehouseStock[];
 }

@@ -13,6 +13,13 @@ import { CreateProductDto } from './dto/create-product.dto';
   dto: {
     create: CreateProductDto,
   },
+  query: {
+    join: {
+      storedIn: {
+        eager: true,
+      },
+    },
+  },
 })
 @Controller('products')
 export class ProductsController implements CrudController<Product> {
