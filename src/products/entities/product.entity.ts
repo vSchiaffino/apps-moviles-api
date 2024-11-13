@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { WarehouseStock } from 'src/warehouses/entities/warehouse-stock.entity';
+import { StockLevel } from 'src/stock-levels/entities/stock-level.entity';
 
 @Entity()
 export class Product extends BaseEntity {
@@ -19,4 +20,7 @@ export class Product extends BaseEntity {
     onDelete: 'CASCADE',
   })
   storedIn: WarehouseStock[];
+
+  @OneToMany(() => StockLevel, (stockLevel) => stockLevel.products)
+  stockLevels: StockLevel[];
 }

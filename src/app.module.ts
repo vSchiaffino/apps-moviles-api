@@ -7,6 +7,7 @@ import { CryptoService } from './crypto/crypto.service';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { WarehousesModule } from './warehouses/warehouses.module';
+import { StockLevelsModule } from './stock-levels/stock-levels.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { WarehousesModule } from './warehouses/warehouses.module';
     UsersModule,
     ProductsModule,
     WarehousesModule,
+    StockLevelsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, CryptoService],
