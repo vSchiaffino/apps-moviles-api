@@ -16,7 +16,6 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
 
   async addStock(warehouseId: number, body: AddStockDto) {
     const warehouse = await this.repo.findOneBy({ id: warehouseId });
-    console.log(warehouse);
 
     if (!warehouse) throw new NotFoundException('Depósito no encontrado');
 

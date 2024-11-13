@@ -11,7 +11,6 @@ import { StockLevelProduct } from './entities/stock-level-product.entity';
 @Injectable()
 export class StockLevelsService {
   async create(createStockLevelDto: CreateStockLevelDto) {
-    console.log(createStockLevelDto.date);
     const exists = await StockLevel.findOneBy({
       date: createStockLevelDto.date as any,
     });
@@ -44,7 +43,6 @@ export class StockLevelsService {
           stockLevel: { id },
           product: { id: product.productId },
         });
-        console.log(stockLevelProduct);
         stockLevelProduct.initialStock = product.initialStock;
         stockLevelProduct.finalStock = product.finalStock;
         await stockLevelProduct.save();

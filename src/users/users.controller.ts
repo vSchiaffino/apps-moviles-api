@@ -49,9 +49,7 @@ export class UsersController {
     @Body() changePasswordDto: ChangePasswordDto,
     @Req() request: Request,
   ) {
-    console.log(request.headers);
     const authorization = request.headers['authorization'];
-    console.log(authorization, changePasswordDto);
     const payload = this.cryptoService.verifyToken(authorization);
     return this.userService.changePassword(payload.id, changePasswordDto);
   }
@@ -61,9 +59,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @Req() request: Request,
   ) {
-    console.log(request.headers);
     const authorization = request.headers['authorization'];
-    console.log(authorization, updateUserDto);
     const payload = this.cryptoService.verifyToken(authorization);
     return this.userService.editUser(payload.id, updateUserDto);
   }

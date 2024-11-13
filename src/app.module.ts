@@ -8,6 +8,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import { WarehousesModule } from './warehouses/warehouses.module';
 import { StockLevelsModule } from './stock-levels/stock-levels.module';
+import { ReportsModule } from './reports/reports.module';
+import { SalesModule } from './sales/sales.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { StockLevelsModule } from './stock-levels/stock-levels.module';
     ProductsModule,
     WarehousesModule,
     StockLevelsModule,
+    ReportsModule,
+    SalesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, CryptoService],
