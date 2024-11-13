@@ -18,7 +18,7 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
     const warehouse = await this.repo.findOneBy({ id: warehouseId });
     console.log(warehouse);
 
-    if (!warehouse) throw new NotFoundException('Warehouse not found');
+    if (!warehouse) throw new NotFoundException('Depósito no encontrado');
 
     let stock = warehouse.stock.find(
       (stock) => stock.product.id === body.productId,
@@ -50,17 +50,18 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
       productPromise,
     ]);
 
-    if (!product) throw new NotFoundException('Product not found');
-    if (!origin) throw new NotFoundException('Origin warehouse not found');
+    if (!product) throw new NotFoundException('Producto no encontrado');
+    if (!origin)
+      throw new NotFoundException('Depósito de origen no encontrado');
     if (!destination)
-      throw new NotFoundException('Destination warehouse not found');
+      throw new NotFoundException('Depósito de destino no encontrado');
 
     let originStock = origin.stock.find(
       (stock) => stock.product.id === productId,
     );
     if (!originStock || originStock.quantity < quantity)
       throw new NotFoundException(
-        'Origin warehouse does not have enough stock',
+        'No hay suficiente stock en el depósito de origen',
       );
 
     let destinationStock = destination.stock.find(

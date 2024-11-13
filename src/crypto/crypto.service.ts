@@ -39,7 +39,7 @@ export class CryptoService {
         this.configService.getOrThrow<string>('JWT_SECRET'),
       ) as JwtPayload;
     } catch (error) {
-      throw new UnauthorizedException('Invalid token or not provided');
+      throw new UnauthorizedException('Token invalido o no proporcionado');
     }
   }
 }

@@ -70,7 +70,7 @@ export class UsersService {
     );
     if (!isPasswordValid)
       throw new BadRequestException({
-        message: 'Invalid password',
+        message: 'Contraseña inválida',
       });
     await User.update(id, {
       hashedPassword: await this.cryptoService.hash(newPassword),
