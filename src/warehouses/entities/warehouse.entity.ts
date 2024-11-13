@@ -18,6 +18,10 @@ export class Warehouse extends BaseEntity {
   @Column()
   capacity: number;
 
-  @OneToMany(() => WarehouseStock, (warehouseStock) => warehouseStock.warehouse, { eager: true })
+  @OneToMany(
+    () => WarehouseStock,
+    (warehouseStock) => warehouseStock.warehouse,
+    { eager: true, onDelete: 'CASCADE' },
+  )
   stock: WarehouseStock[];
 }
