@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptoService } from 'src/crypto/crypto.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -43,5 +49,34 @@ export class UsersService {
       hashedPassword: await this.cryptoService.hash(password),
       user,
     });
+  }
+
+  public async editUser(id: number, updateUserDto: UpdateUserDto) {
+    delete updateUserDto.password;
+    await User.update(id, updateUserDto);
+    const user = await User.findOneBy({ id });
+    delete user.hashedPassword;
+    return user;
+  }
+
+  public async changePassword(
+    id: number,
+    { password, newPassword }: ChangePasswordDto,
+  ) {
+    const user = await User.findOneBy({ id });
+    const isPasswordValid = await this.cryptoService.verify(
+      password,
+      user.hashedPassword,
+    );
+    if (!isPasswordValid)
+      throw new BadRequestException({
+        message: 'Invalid password',
+      });
+    await User.update(id, {
+      hashedPassword: await this.cryptoService.hash(newPassword),
+    });
+    return {
+      message: 'Ok',
+    };
   }
 }

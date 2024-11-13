@@ -1,11 +1,24 @@
-import { Body, ConflictException, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  ConflictException,
+  Controller,
+  Post,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CryptoService } from 'src/crypto/crypto.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly cryptoService: CryptoService,
+  ) {}
 
   private async validateUser(userDto: CreateUserDto) {
     const { mail, user } = userDto;
@@ -29,6 +42,30 @@ export class UsersController {
     const createdUser = await this.userService.create(createUserDto);
     const { hashedPassword, ...user } = createdUser;
     return user;
+  }
+
+  @Put('/password')
+  public async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Req() request: Request,
+  ) {
+    console.log(request.headers);
+    const authorization = request.headers['authorization'];
+    console.log(authorization, changePasswordDto);
+    const payload = this.cryptoService.verifyToken(authorization);
+    return this.userService.changePassword(payload.id, changePasswordDto);
+  }
+
+  @Put()
+  public async editUser(
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() request: Request,
+  ) {
+    console.log(request.headers);
+    const authorization = request.headers['authorization'];
+    console.log(authorization, updateUserDto);
+    const payload = this.cryptoService.verifyToken(authorization);
+    return this.userService.editUser(payload.id, updateUserDto);
   }
 
   @Post('/login')

@@ -18,6 +18,9 @@ import { CreateProductDto } from './dto/create-product.dto';
       storedIn: {
         eager: true,
       },
+      'storedIn.warehouse': {
+        eager: true,
+      },
     },
   },
 })
