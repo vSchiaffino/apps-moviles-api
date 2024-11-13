@@ -18,6 +18,7 @@ export class Sale extends BaseEntity {
   @OneToMany(() => SaleProduct, (saleProduct) => saleProduct.sale, {
     eager: true,
     cascade: true,
+    onDelete: 'CASCADE',
   })
   products: SaleProduct[];
 }
@@ -27,7 +28,7 @@ export class SaleProduct extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Sale, (sale) => sale.products)
+  @ManyToOne(() => Sale, (sale) => sale.products, { onDelete: 'CASCADE' })
   sale: Sale;
 
   @Column()

@@ -38,4 +38,9 @@ export class SalesService {
       .andWhere('sale.date <= :end', { end })
       .getMany();
   }
+
+  async delete(id: number) {
+    await SaleProduct.delete({ sale: { id } });
+    return Sale.delete({ id });
+  }
 }

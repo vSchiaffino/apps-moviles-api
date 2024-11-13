@@ -25,4 +25,9 @@ export class SalesController {
   findAll(@Query('start') startDate, @Query('end') endDate: string) {
     return this.salesService.findAll(startDate, endDate);
   }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.salesService.delete(+id);
+  }
 }
