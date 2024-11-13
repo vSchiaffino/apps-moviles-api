@@ -2,8 +2,7 @@ import { Type } from 'class-transformer';
 import { IsDateString, Matches } from 'class-validator';
 
 export class CreateStockLevelDto {
-  @Type(() => Date)
-  date: Date;
+  date: string;
 
   products: {
     productId: number;

@@ -21,6 +21,8 @@ export class Product extends BaseEntity {
   })
   storedIn: WarehouseStock[];
 
-  @OneToMany(() => StockLevel, (stockLevel) => stockLevel.products)
+  @OneToMany(() => StockLevel, (stockLevel) => stockLevel.products, {
+    onDelete: 'CASCADE',
+  })
   stockLevels: StockLevel[];
 }

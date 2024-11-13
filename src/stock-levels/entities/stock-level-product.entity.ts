@@ -16,7 +16,10 @@ export class StockLevelProduct extends BaseEntity {
   @ManyToOne(() => StockLevel, (stockLevel) => stockLevel.products)
   stockLevel: StockLevel;
 
-  @ManyToOne(() => Product, (product) => product.stockLevels, { eager: true })
+  @ManyToOne(() => Product, (product) => product.stockLevels, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   product: Product;
 
   @Column()

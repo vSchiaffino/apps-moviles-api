@@ -11,8 +11,9 @@ import { StockLevelProduct } from './entities/stock-level-product.entity';
 @Injectable()
 export class StockLevelsService {
   async create(createStockLevelDto: CreateStockLevelDto) {
+    console.log(createStockLevelDto.date);
     const exists = await StockLevel.findOneBy({
-      date: createStockLevelDto.date,
+      date: createStockLevelDto.date as any,
     });
     if (exists)
       throw new BadRequestException('Stock level already exists for this date');
@@ -26,7 +27,7 @@ export class StockLevelsService {
         product: { id: product.productId },
       })),
     );
-    return StockLevel.findOneBy({ date: createStockLevelDto.date });
+    return StockLevel.findOneBy({ date: createStockLevelDto.date as any });
   }
 
   async getByDate(date: Date) {
