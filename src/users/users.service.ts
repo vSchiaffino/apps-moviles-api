@@ -36,12 +36,16 @@ export class UsersService {
   }
 
   public async create({ user, mail, name, lastName, password }: CreateUserDto) {
-    return User.save({
+    const newUser = await User.save({
       mail,
       name,
       lastName,
       hashedPassword: await this.cryptoService.hash(password),
       user,
     });
+  
+    const { hashedPassword, ...payload } = newUser;
+    const token = this.cryptoService.sign(payload);
+    return { token };
   }
 }
