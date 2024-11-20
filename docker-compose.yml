@@ -3,28 +3,28 @@ services:
     container_name: apps_moviles_db
     image: postgres:14.4-alpine
     ports:
-      - '5450:5432'
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: apps_moviles
     volumes:
       - ./data:/var/lib/postgresql/data
-  # api:
-  #   container_name: apps_moviles_api
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '9000:9000'
-  #   depends_on:
-  #     - postgres
-  #   environment:
-  #     JWT_SECRET: secret
-  #     JWT_EXPIRES_IN: 30d
-  #     POSTGRES_HOST: apps_moviles_db
-  #     POSTGRES_PORT: 5432
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: apps_moviles
-  #     PORT: 9000
+  api:
+    container_name: apps_moviles_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '9000:9000'
+    depends_on:
+      - postgres
+    environment:
+      JWT_SECRET: secret
+      JWT_EXPIRES_IN: 30d
+      POSTGRES_HOST: apps_moviles_db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apps_moviles
+      PORT: 9000
