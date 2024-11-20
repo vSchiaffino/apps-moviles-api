@@ -6,13 +6,25 @@ import {
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { CryptoService } from 'src/crypto/crypto.service';
+import { CryptoService } from 'src/providers/crypto.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { AwsService } from 'src/providers/aws.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly cryptoService: CryptoService) {}
+  constructor(
+    private readonly cryptoService: CryptoService,
+    private readonly awsService: AwsService,
+  ) {}
+
+  async changeProfilePicture(id: number, file: Express.Multer.File) {
+    const url = await this.awsService.uploadImage(file);
+    await User.update(id, { profilePictureUrl: url });
+    const user = await User.findOneBy({ id });
+    const { hashedPassword, ...rest } = user;
+    return rest;
+  }
 
   public async login(user: string, password: string) {
     const findedUser = await User.findOne({

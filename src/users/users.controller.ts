@@ -1,17 +1,21 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
   Post,
   Put,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CryptoService } from 'src/crypto/crypto.service';
+import { CryptoService } from 'src/providers/crypto.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -40,7 +44,6 @@ export class UsersController {
   public async createUser(@Body() createUserDto: CreateUserDto) {
     await this.validateUser(createUserDto);
     return await this.userService.create(createUserDto);
-  
   }
 
   @Put('/password')
@@ -66,5 +69,20 @@ export class UsersController {
   @Post('/login')
   public async loginUser(@Body() { user, password }: LoginUserDto) {
     return await this.userService.login(user, password);
+  }
+
+  @Post('picture')
+  @UseInterceptors(FileInterceptor('file'))
+  public async changeProfilePicture(
+    @Req() request: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file)
+      throw new BadRequestException(
+        'request should include the profile picture file',
+      );
+    const authorization = request.headers['authorization'];
+    const payload = this.cryptoService.verifyToken(authorization);
+    return this.userService.changeProfilePicture(payload.id, file);
   }
 }
