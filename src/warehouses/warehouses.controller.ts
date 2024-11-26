@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import { Crud, CrudController } from '@dataui/crud';
+import { Crud } from '@dataui/crud';
 
 import { Warehouse } from 'src/warehouses/entities/warehouse.entity';
 import { CreateWarehouseDto } from 'src/warehouses/dto/create-warehouse.dto';
@@ -25,7 +25,7 @@ import { TransferBodyDto } from './dto/transfer-body.dto';
   },
 })
 @Controller('warehouses')
-export class WarehouseController implements CrudController<Warehouse> {
+export class WarehouseController {
   constructor(public service: WarehouseService) {}
 
   @Post(':id/stock')

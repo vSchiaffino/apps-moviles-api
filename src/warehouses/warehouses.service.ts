@@ -1,12 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TypeOrmCrudService } from '@dataui/crud-typeorm';
 
 import { Warehouse } from './entities/warehouse.entity';
 import { AddStockDto } from './dto/add-stock.dto';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { WarehouseStock } from './entities/warehouse-stock.entity';
 import { TransferBodyDto } from './dto/transfer-body.dto';
+import { TypeOrmCrudService } from '@dataui/crud-typeorm';
+import { CrudRequest } from '@dataui/crud';
 
 @Injectable()
 export class WarehouseService extends TypeOrmCrudService<Warehouse> {
@@ -14,8 +19,18 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
     super(repo);
   }
 
+  actualStockOf(warehouse: Warehouse) {
+    return warehouse.stock.reduce((acc, stock) => acc + stock.quantity, 0);
+  }
+
   async addStock(warehouseId: number, body: AddStockDto) {
     const warehouse = await this.repo.findOneBy({ id: warehouseId });
+    const actualStock = this.actualStockOf(warehouse);
+    if (actualStock + body.quantity > warehouse.capacity) {
+      throw new BadRequestException(
+        'El depósito no tiene capacidad suficiente',
+      );
+    }
 
     if (!warehouse) throw new NotFoundException('Depósito no encontrado');
 
@@ -81,5 +96,20 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
     return {
       message: 'Stock transferred successfully',
     };
+  }
+
+  async replaceOne(
+    req: CrudRequest,
+    dto: DeepPartial<Warehouse>,
+  ): Promise<Warehouse> {
+    const id = req.parsed.paramsFilter[0].value;
+    const warehouse = await this.repo.findOneBy({ id });
+    const actualStock = this.actualStockOf(warehouse);
+    if (actualStock > dto.capacity) {
+      throw new BadRequestException(
+        'La capacidad del depósito no puede ser menor al stock actual',
+      );
+    }
+    return super.replaceOne(req, dto);
   }
 }
