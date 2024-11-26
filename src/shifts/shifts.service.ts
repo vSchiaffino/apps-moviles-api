@@ -1,5 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { IsNull, Repository } from 'typeorm';
 import { Shift } from './entities/shift.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -14,12 +18,15 @@ export class ShiftsService {
   }
 
   async getCurrentShift() {
-    const shift = await this.repo.findOne({ where: { endDate: null } });
+    const shift = await this.repo.findOne({ where: { endDate: IsNull() } });
     if (!shift) throw new NotFoundException('No hay un turno activo');
     return shift;
   }
 
   async startShift() {
+    if (await this.repo.findOne({ where: { endDate: IsNull() } })) {
+      throw new BadRequestException('Ya hay un turno activo');
+    }
     return Shift.save({ startDate: new Date() });
   }
 }
