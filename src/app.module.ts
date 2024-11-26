@@ -11,6 +11,7 @@ import { StockLevelsModule } from './stock-levels/stock-levels.module';
 import { ReportsModule } from './reports/reports.module';
 import { SalesModule } from './sales/sales.module';
 import { AwsService } from './providers/aws.service';
+import { ShiftsModule } from './shifts/shifts.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AwsService } from './providers/aws.service';
     StockLevelsModule,
     ReportsModule,
     SalesModule,
+    ShiftsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, CryptoService, AwsService],
