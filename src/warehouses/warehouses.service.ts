@@ -12,10 +12,14 @@ import { WarehouseStock } from './entities/warehouse-stock.entity';
 import { TransferBodyDto } from './dto/transfer-body.dto';
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
 import { CrudRequest } from '@dataui/crud';
+import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
 export class WarehouseService extends TypeOrmCrudService<Warehouse> {
-  constructor(@InjectRepository(Warehouse) repo: Repository<Warehouse>) {
+  constructor(
+    @InjectRepository(Warehouse) repo: Repository<Warehouse>,
+    private productService: ProductsService,
+  ) {
     super(repo);
   }
 
@@ -56,7 +60,7 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
   }: TransferBodyDto) {
     const originPromise = this.repo.findOneBy({ id: originId });
     const destinationPromise = this.repo.findOneBy({ id: destinationId });
-    const productPromise = this.repo.findOneBy({ id: productId });
+    const productPromise = this.productService.findOneBy({ id: productId });
 
     const [origin, destination, product] = await Promise.all([
       originPromise,
@@ -76,6 +80,16 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
     if (!originStock || originStock.quantity < quantity)
       throw new NotFoundException(
         'No hay suficiente stock en el depósito de origen',
+      );
+
+    if (origin.id === destination.id)
+      throw new BadRequestException(
+        'El depósito de origen y destino no pueden ser el mismo',
+      );
+
+    if (this.actualStockOf(destination) + quantity > destination.capacity)
+      throw new BadRequestException(
+        'El depósito de destino no tiene capacidad suficiente',
       );
 
     let destinationStock = destination.stock.find(
