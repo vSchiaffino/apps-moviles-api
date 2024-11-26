@@ -6,15 +6,20 @@ import {
 import { IsNull, Repository } from 'typeorm';
 import { Shift } from './entities/shift.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ShiftGateway } from './shift-gateway.service';
 
 @Injectable()
 export class ShiftsService {
-  constructor(@InjectRepository(Shift) private repo: Repository<Shift>) {}
+  constructor(
+    @InjectRepository(Shift) private repo: Repository<Shift>,
+    private shiftGateway: ShiftGateway,
+  ) {}
 
   async endCurrentShift() {
     const shift = await this.getCurrentShift();
     shift.endDate = new Date();
-    return await shift.save();
+    await shift.save();
+    this.notifyShiftChange();
   }
 
   async getCurrentShift() {
@@ -27,6 +32,12 @@ export class ShiftsService {
     if (await this.repo.findOne({ where: { endDate: IsNull() } })) {
       throw new BadRequestException('Ya hay un turno activo');
     }
-    return Shift.save({ startDate: new Date() });
+    const shift = await Shift.save({ startDate: new Date() });
+    this.notifyShiftChange();
+    return shift;
+  }
+
+  async notifyShiftChange() {
+    this.shiftGateway.server.emit('shiftChange');
   }
 }
