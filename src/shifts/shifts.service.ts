@@ -37,7 +37,17 @@ export class ShiftsService {
       },
     });
     return Promise.all(
-      shifts.map((shift) => this.fillProductAndWarehouse(shift)),
+      shifts
+        .filter(
+          (shift) =>
+            !!shift.missing &&
+            shift.missing.length > 0 &&
+            !!shift.startStock &&
+            shift.startStock.length > 0 &&
+            !!shift.endStock &&
+            shift.endStock.length > 0,
+        )
+        .map((shift) => this.fillProductAndWarehouse(shift)),
     );
   }
 
