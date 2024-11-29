@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import {
   IsNull,
+  Not,
   Repository,
   LessThanOrEqual,
   MoreThanOrEqual,
@@ -30,6 +31,7 @@ export class ShiftsService {
   async getReport(query: ReportQueryDto) {
     const shifts = await this.repo.find({
       where: {
+        missing: Not(IsNull()),
         startDate: MoreThanOrEqual(new Date(query.startDate)),
         endDate: LessThanOrEqual(new Date(query.endDate)),
       },
