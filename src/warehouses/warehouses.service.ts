@@ -13,6 +13,7 @@ import { TransferBodyDto } from './dto/transfer-body.dto';
 import { TypeOrmCrudService } from '@dataui/crud-typeorm';
 import { CrudRequest } from '@dataui/crud';
 import { ProductsService } from 'src/products/products.service';
+import { StockLevelDto } from 'src/shifts/dto/shift.dto';
 
 @Injectable()
 export class WarehouseService extends TypeOrmCrudService<Warehouse> {
@@ -23,7 +24,28 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
     super(repo);
   }
 
-  actualStockOf(warehouse: Warehouse) {
+  public async getAll() {
+    return this.repo.find({ relations: ['stock', 'stock.product'] });
+  }
+
+  public async setAllStock(
+    warehouseId: number,
+    stocks: StockLevelDto[],
+  ): Promise<void> {
+    const warehouse = await this.repo.findOneBy({ id: warehouseId });
+    if (!warehouse) throw new NotFoundException('Depósito no encontrado');
+    await Promise.all(stocks.map((stock) => this.setStock(warehouse, stock)));
+  }
+
+  private async setStock(warehouse: Warehouse, stock: StockLevelDto) {
+    const stockInDb = warehouse.stock.find(
+      (s) => s.product.id === stock.productId,
+    );
+    stockInDb.quantity = stock.quantity;
+    return stockInDb.save();
+  }
+
+  public actualStockOf(warehouse: Warehouse) {
     return warehouse.stock.reduce((acc, stock) => acc + stock.quantity, 0);
   }
 

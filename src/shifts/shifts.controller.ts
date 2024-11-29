@@ -1,21 +1,14 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ShiftsService } from './shifts.service';
+import ShiftStockDto from './dto/shift.dto';
 
 @Controller('shifts')
 export class ShiftsController {
   constructor(private readonly shiftsService: ShiftsService) {}
 
   @Post()
-  create() {
-    return this.shiftsService.startShift();
+  create(@Body() shifts: ShiftStockDto[]) {
+    return this.shiftsService.startShift(shifts);
   }
 
   @Get()
@@ -23,8 +16,13 @@ export class ShiftsController {
     return this.shiftsService.getCurrentShift();
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.shiftsService.getShift(id);
+  }
+
   @Post('/end')
-  endShift() {
-    return this.shiftsService.endCurrentShift();
+  endShift(@Body() shifts: ShiftStockDto[]) {
+    return this.shiftsService.endCurrentShift(shifts);
   }
 }
