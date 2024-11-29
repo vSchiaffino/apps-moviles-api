@@ -37,4 +37,9 @@ export class WarehouseController {
   async transferStock(@Body() body: TransferBodyDto) {
     return this.service.transferStock(body);
   }
+
+  @Post('/transfer')
+  async egressStock(@Body() body: TransferBodyDto) {
+    return this.service.transferStock(body);
+  }
 }

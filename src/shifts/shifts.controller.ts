@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ShiftsService } from './shifts.service';
 import ShiftStockDto from './dto/shift.dto';
+import { ReportQueryDto } from './dto/report-body.dto';
 
 @Controller('shifts')
 export class ShiftsController {
@@ -16,13 +17,18 @@ export class ShiftsController {
     return this.shiftsService.getCurrentShift();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.shiftsService.getShift(id);
+  @Get('report')
+  report(@Query() query: ReportQueryDto) {
+    return this.shiftsService.getReport(query);
   }
 
   @Post('/end')
   endShift(@Body() shifts: ShiftStockDto[]) {
     return this.shiftsService.endCurrentShift(shifts);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.shiftsService.getShift(id);
   }
 }

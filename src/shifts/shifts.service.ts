@@ -3,13 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IsNull, Repository } from 'typeorm';
+import {
+  IsNull,
+  Repository,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  In,
+} from 'typeorm';
 import { Shift } from './entities/shift.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ShiftGateway } from './shift-gateway.service';
 import ShiftStockDto from './dto/shift.dto';
 import { WarehouseService } from 'src/warehouses/warehouses.service';
 import { Warehouse } from 'src/warehouses/entities/warehouse.entity';
+import { ReportQueryDto } from './dto/report-body.dto';
+import { Product } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class ShiftsService {
@@ -18,6 +26,62 @@ export class ShiftsService {
     private shiftGateway: ShiftGateway,
     private warehouseService: WarehouseService,
   ) {}
+
+  async getReport(query: ReportQueryDto) {
+    const shifts = await this.repo.find({
+      where: {
+        startDate: MoreThanOrEqual(new Date(query.startDate)),
+        endDate: LessThanOrEqual(new Date(query.endDate)),
+      },
+    });
+    return Promise.all(
+      shifts.map((shift) => this.fillProductAndWarehouse(shift)),
+    );
+  }
+
+  async fillProductAndWarehouse(shift: Shift) {
+    const [products, warehouses] = await Promise.all([
+      Product.find({
+        where: {
+          id: In(
+            shift.startStock
+              .map((s) => s.stock.map((stock) => stock.productId))
+              .flat(),
+          ),
+        },
+      }),
+      Warehouse.find({
+        where: {
+          id: In(shift.startStock.map((s) => s.warehouseId)),
+        },
+      }),
+    ]);
+    shift.startStock = shift.startStock.map((s) => ({
+      ...s,
+      stock: s.stock.map((stock) => ({
+        ...stock,
+        product: products.find((p) => p.id === stock.productId),
+      })),
+      warehouse: warehouses.find((w) => w.id === s.warehouseId),
+    }));
+    shift.missing = shift.missing.map((s) => ({
+      ...s,
+      stock: s.stock.map((stock) => ({
+        ...stock,
+        product: products.find((p) => p.id === stock.productId),
+      })),
+      warehouse: warehouses.find((w) => w.id === s.warehouseId),
+    }));
+    shift.endStock = shift.endStock.map((s) => ({
+      ...s,
+      stock: s.stock.map((stock) => ({
+        ...stock,
+        product: products.find((p) => p.id === stock.productId),
+      })),
+      warehouse: warehouses.find((w) => w.id === s.warehouseId),
+    }));
+    return shift;
+  }
 
   async endCurrentShift(dtos: ShiftStockDto[]) {
     const shift = await this.getCurrentShift();
@@ -53,7 +117,9 @@ export class ShiftsService {
   }
 
   async getShift(id: number) {
-    return await this.repo.find({ where: { id } });
+    return this.fillProductAndWarehouse(
+      await this.repo.findOne({ where: { id } }),
+    );
   }
 
   async getCurrentShift() {
