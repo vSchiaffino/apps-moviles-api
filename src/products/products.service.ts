@@ -5,6 +5,8 @@ import { TypeOrmCrudService } from '@dataui/crud-typeorm';
 import { Product } from './entities/product.entity';
 import { StockLevelProduct } from 'src/stock-levels/entities/stock-level-product.entity';
 import { NotificationService } from 'src/notifications/notifications.service';
+import { WarehouseStock } from 'src/warehouses/entities/warehouse-stock.entity';
+import { LessThanOrEqual } from 'typeorm';
 
 @Injectable()
 export class ProductsService extends TypeOrmCrudService<Product> {
@@ -13,6 +15,10 @@ export class ProductsService extends TypeOrmCrudService<Product> {
     private notificationService: NotificationService,
   ) {
     super(repo);
+  }
+  
+  deleteStocksInZero() {
+    return WarehouseStock.delete({ quantity: LessThanOrEqual(0) });
   }
 
   async checkLowStocks(productsIds?: number[]) {
@@ -27,8 +33,8 @@ export class ProductsService extends TypeOrmCrudService<Product> {
       )
       .groupBy('product.id')
       .addGroupBy('product.name');
-      if (productsIds && productsIds.length > 0)
-        builder.andWhere('product.id IN (:...ids)', { ids: productsIds });
+    if (productsIds && productsIds.length > 0)
+      builder.andWhere('product.id IN (:...ids)', { ids: productsIds });
 
     const products = await builder.getRawMany();
     await Promise.all(

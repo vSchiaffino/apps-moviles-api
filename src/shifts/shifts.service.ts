@@ -47,7 +47,7 @@ export class ShiftsService {
     if (!product) throw new NotFoundException('Producto no encontrado');
     if (!warehouse) throw new NotFoundException('Depósito  no encontrado');
     if (!stock || quantity > stock.quantity)
-      throw new NotFoundException('No hay stock sufuciente en el depósito');
+      throw new NotFoundException('No hay stock suficiente en el depósito');
 
     let egress: ShiftEgress;
     await this.repo.manager.transaction(async (transactionalEntityManager) => {
@@ -61,6 +61,7 @@ export class ShiftsService {
       });
     });
     await this.productService.checkLowStocks([product.id]);
+    await this.productService.deleteStocksInZero()
     return egress;
   }
 

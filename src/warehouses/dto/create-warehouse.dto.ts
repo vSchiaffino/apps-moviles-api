@@ -5,6 +5,6 @@ export class CreateWarehouseDto {
   name: string;
 
   @IsNumber()
-  @IsPositive()
+  @IsPositive({ message: 'La capacidad debe ser positiva' })
   capacity: number;
 }

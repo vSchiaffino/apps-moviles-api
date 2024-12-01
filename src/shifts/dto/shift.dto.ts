@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  ValidateNested,
+} from 'class-validator';
 
 export default class ShiftStockDto {
   @IsNotEmpty()
@@ -16,6 +22,7 @@ export class StockLevelDto {
   productId: number;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsInt()
+  @IsPositive({ message: 'La cantidad debe ser positiva' })
   quantity: number;
 }

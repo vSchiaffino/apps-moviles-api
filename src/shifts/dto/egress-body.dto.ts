@@ -11,6 +11,6 @@ export class EgressBodyDto {
 
   @IsNotEmpty()
   @IsNumber()
-  @IsPositive()
+  @IsPositive({ message: 'La cantidad debe ser positiva' })
   quantity: number;
 }

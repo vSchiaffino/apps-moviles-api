@@ -35,6 +35,7 @@ export class WarehouseService extends TypeOrmCrudService<Warehouse> {
     const warehouse = await this.repo.findOneBy({ id: warehouseId });
     if (!warehouse) throw new NotFoundException('Depósito no encontrado');
     await Promise.all(stocks.map((stock) => this.setStock(warehouse, stock)));
+    await this.productService.deleteStocksInZero();
   }
 
   private async setStock(warehouse: Warehouse, stock: StockLevelDto) {
