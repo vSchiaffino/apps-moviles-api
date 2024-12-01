@@ -36,7 +36,6 @@ export class ProductsService extends TypeOrmCrudService<Product> {
           this.notificationService.sendLowStockNotification(product),
         ),
     );
-    return products;
   }
 
   async customDelete(id: string) {

@@ -21,6 +21,9 @@ import { ReportQueryDto } from './dto/report-body.dto';
 import { Product } from 'src/products/entities/product.entity';
 import { NotificationService } from 'src/notifications/notifications.service';
 import { ProductsService } from 'src/products/products.service';
+import { EgressBodyDto } from './dto/egress-body.dto';
+import { WarehouseStock } from 'src/warehouses/entities/warehouse-stock.entity';
+import { ShiftEgress } from './entities/shift-egress.entity';
 
 @Injectable()
 export class ShiftsService {
@@ -31,6 +34,34 @@ export class ShiftsService {
     private notificationService: NotificationService,
     private productService: ProductsService,
   ) {}
+
+  async registerEgress({ productId, warehouseId, quantity }: EgressBodyDto) {
+    const [shift, product, warehouse, stock] = await Promise.all([
+      this.getCurrentShift(),
+      Product.findOne({ where: { id: productId } }),
+      Warehouse.findOne({ where: { id: warehouseId } }),
+      WarehouseStock.findOne({
+        where: { product: { id: productId }, warehouse: { id: warehouseId } },
+      }),
+    ]);
+    if (!product) throw new NotFoundException('Producto no encontrado');
+    if (!warehouse) throw new NotFoundException('Depósito  no encontrado');
+    if (!stock || quantity > stock.quantity)
+      throw new NotFoundException('No hay stock sufuciente en el depósito');
+
+    let egress: ShiftEgress;
+    await this.repo.manager.transaction(async (transactionalEntityManager) => {
+      stock.quantity -= quantity;
+      await transactionalEntityManager.save(stock);
+      egress = await transactionalEntityManager.save(ShiftEgress, {
+        product: { id: productId },
+        warehouse: { id: warehouseId },
+        quantity,
+        shift: { id: shift.id },
+      });
+    });
+    return egress;
+  }
 
   async getReport(query: ReportQueryDto) {
     const shifts = await this.repo.find({
@@ -139,7 +170,10 @@ export class ShiftsService {
   }
 
   async getCurrentShift() {
-    const shift = await this.repo.findOne({ where: { endDate: IsNull() } });
+    const shift = await this.repo.findOne({
+      where: { endDate: IsNull() },
+      relations: ['egresses', 'egresses.product', 'egresses.warehouse'],
+    });
     if (!shift) throw new NotFoundException('No hay un turno activo');
     return shift;
   }

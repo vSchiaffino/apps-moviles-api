@@ -1,5 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import ShiftStockDto from '../dto/shift.dto';
+import { ShiftEgress } from './shift-egress.entity';
 
 @Entity()
 export class Shift extends BaseEntity {
@@ -20,4 +27,7 @@ export class Shift extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   missing?: ShiftStockDto[];
+
+  @OneToMany(() => ShiftEgress, (shiftEgress) => shiftEgress.shift)
+  egresses: ShiftEgress[];
 }

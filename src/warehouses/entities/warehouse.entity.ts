@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { WarehouseStock } from './warehouse-stock.entity';
+import { ShiftEgress } from 'src/shifts/entities/shift-egress.entity';
 
 @Entity()
 export class Warehouse extends BaseEntity {
@@ -24,4 +25,7 @@ export class Warehouse extends BaseEntity {
     { eager: true, onDelete: 'CASCADE' },
   )
   stock: WarehouseStock[];
+
+  @OneToMany(() => ShiftEgress, (egress) => egress.warehouse)
+  egresses: ShiftEgress[];
 }

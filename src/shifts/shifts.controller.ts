@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ShiftsService } from './shifts.service';
 import ShiftStockDto from './dto/shift.dto';
 import { ReportQueryDto } from './dto/report-body.dto';
+import { EgressBodyDto } from './dto/egress-body.dto';
 
 @Controller('shifts')
 export class ShiftsController {
@@ -25,6 +34,11 @@ export class ShiftsController {
   @Post('/end')
   endShift(@Body() shifts: ShiftStockDto[]) {
     return this.shiftsService.endCurrentShift(shifts);
+  }
+
+  @Post('egress')
+  registerEgress(@Body() egressBody: EgressBodyDto) {
+    return this.shiftsService.registerEgress(egressBody);
   }
 
   @Get(':id')
