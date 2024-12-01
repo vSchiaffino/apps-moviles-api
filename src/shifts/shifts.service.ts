@@ -20,6 +20,7 @@ import { Warehouse } from 'src/warehouses/entities/warehouse.entity';
 import { ReportQueryDto } from './dto/report-body.dto';
 import { Product } from 'src/products/entities/product.entity';
 import { NotificationService } from 'src/notifications/notifications.service';
+import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
 export class ShiftsService {
@@ -28,6 +29,7 @@ export class ShiftsService {
     private shiftGateway: ShiftGateway,
     private warehouseService: WarehouseService,
     private notificationService: NotificationService,
+    private productService: ProductsService,
   ) {}
 
   async getReport(query: ReportQueryDto) {
@@ -109,7 +111,7 @@ export class ShiftsService {
       ),
     );
     await shift.save();
-    this.notifyShiftChange();
+    this.notifyShiftChange(false);
   }
 
   private calculateMissingStock(
@@ -152,15 +154,16 @@ export class ShiftsService {
         this.warehouseService.setAllStock(warehouseId, stock),
       ),
     );
-    this.notifyShiftChange();
+    this.notifyShiftChange(true);
     return shift;
   }
 
-  async notifyShiftChange() {
+  async notifyShiftChange(open: boolean) {
     this.shiftGateway.server.emit('shiftChange');
     this.notificationService.sendToAllUsers(
-      'Se inicio un turno',
-      'un turno ha sido iniciado',
+      `Se ${open ? 'inicio' : 'termino'} un turno`,
+      `un turno ha sido ${open ? 'iniciado' : 'terminado'}`,
     );
+    this.productService.checkLowStocks();
   }
 }

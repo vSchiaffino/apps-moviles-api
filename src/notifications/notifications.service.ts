@@ -5,6 +5,15 @@ import { UsersService } from 'src/users/users.service';
 export class NotificationService {
   constructor(private userService: UsersService) {}
 
+  async sendLowStockNotification(product: {
+    name: string;
+    totalQuantity: number;
+  }) {
+    const title = 'Stock bajo';
+    const body = `El producto ${product.name} tiene un stock de ${product.totalQuantity}`;
+    await this.sendToAllUsers(title, body);
+  }
+
   async sendPushNotification(token: string, title: string, body: string) {
     try {
       fetch(process.env.EXPO_PUSH_NOTIFICATION_URL, {
