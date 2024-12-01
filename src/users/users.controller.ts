@@ -67,8 +67,8 @@ export class UsersController {
   }
 
   @Post('/login')
-  public async loginUser(@Body() { user, password }: LoginUserDto) {
-    return await this.userService.login(user, password);
+  public async loginUser(@Body() dto: LoginUserDto) {
+    return await this.userService.login(dto);
   }
 
   @Post('picture')

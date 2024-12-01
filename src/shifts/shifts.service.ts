@@ -19,6 +19,7 @@ import { WarehouseService } from 'src/warehouses/warehouses.service';
 import { Warehouse } from 'src/warehouses/entities/warehouse.entity';
 import { ReportQueryDto } from './dto/report-body.dto';
 import { Product } from 'src/products/entities/product.entity';
+import { NotificationService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ShiftsService {
@@ -26,6 +27,7 @@ export class ShiftsService {
     @InjectRepository(Shift) private repo: Repository<Shift>,
     private shiftGateway: ShiftGateway,
     private warehouseService: WarehouseService,
+    private notificationService: NotificationService,
   ) {}
 
   async getReport(query: ReportQueryDto) {
@@ -156,5 +158,9 @@ export class ShiftsService {
 
   async notifyShiftChange() {
     this.shiftGateway.server.emit('shiftChange');
+    this.notificationService.sendToAllUsers(
+      'Se inicio un turno',
+      'un turno ha sido iniciado',
+    );
   }
 }

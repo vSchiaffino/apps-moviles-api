@@ -10,6 +10,8 @@ import { CryptoService } from 'src/providers/crypto.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { AwsService } from 'src/providers/aws.service';
+import { LoginUserDto } from './dto/login-user.dto';
+import { IsNull, Not } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -26,7 +28,7 @@ export class UsersService {
     return rest;
   }
 
-  public async login(user: string, password: string) {
+  public async login({ user, password, token }: LoginUserDto) {
     const findedUser = await User.findOne({
       where: {
         user,
@@ -39,6 +41,7 @@ export class UsersService {
       throw new UnauthorizedException({
         message: 'Credenciales inválidas',
       });
+    if (token) await User.update(findedUser.id, { token });
 
     const { hashedPassword, ...payload } = findedUser;
     return {
@@ -61,7 +64,7 @@ export class UsersService {
       hashedPassword: await this.cryptoService.hash(password),
       user,
     });
-  
+
     const { hashedPassword, ...payload } = newUser;
     const token = this.cryptoService.sign(payload);
     return { token: token };
@@ -94,5 +97,9 @@ export class UsersService {
     return {
       message: 'Ok',
     };
+  }
+
+  public async getAllUsersWithToken() {
+    return User.find({ where: { token: Not(IsNull()) } });
   }
 }

@@ -11,5 +11,6 @@ import { AwsService } from 'src/providers/aws.service';
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService, CryptoService, ConfigService, AwsService],
+  exports: [UsersService],
 })
 export class UsersModule {}
