@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 
 export class EgressBodyDto {
   @IsNotEmpty()
@@ -11,5 +11,6 @@ export class EgressBodyDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive()
   quantity: number;
 }

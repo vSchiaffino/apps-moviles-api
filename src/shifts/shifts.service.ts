@@ -60,6 +60,7 @@ export class ShiftsService {
         shift: { id: shift.id },
       });
     });
+    await this.productService.checkLowStocks([product.id]);
     return egress;
   }
 

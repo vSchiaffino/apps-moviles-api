@@ -15,8 +15,8 @@ export class ProductsService extends TypeOrmCrudService<Product> {
     super(repo);
   }
 
-  async checkLowStocks() {
-    const products = await this.repo
+  async checkLowStocks(productsIds?: number[]) {
+    const builder = this.repo
       .createQueryBuilder('product')
       .select('product.name', 'name')
       .addSelect('SUM(warehouse_stock.quantity)', 'totalQuantity')
@@ -26,9 +26,11 @@ export class ProductsService extends TypeOrmCrudService<Product> {
         'product.id = warehouse_stock.productId',
       )
       .groupBy('product.id')
-      .addGroupBy('product.name')
-      .getRawMany();
+      .addGroupBy('product.name');
+      if (productsIds && productsIds.length > 0)
+        builder.andWhere('product.id IN (:...ids)', { ids: productsIds });
 
+    const products = await builder.getRawMany();
     await Promise.all(
       products
         .filter((product) => product.totalQuantity < 10)
