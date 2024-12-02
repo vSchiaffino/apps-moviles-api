@@ -31,6 +31,11 @@ export class ShiftsController {
     return this.shiftsService.getReport(query);
   }
 
+  @Get('chart')
+  chart() {
+    return this.shiftsService.getChartData();
+  }
+
   @Post('/end')
   endShift(@Body() shifts: ShiftStockDto[]) {
     return this.shiftsService.endCurrentShift(shifts);

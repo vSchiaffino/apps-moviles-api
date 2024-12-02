@@ -35,6 +35,23 @@ export class ShiftsService {
     private productService: ProductsService,
   ) {}
 
+  async getChartData() {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const egressData = await ShiftEgress.createQueryBuilder('shiftEgress')
+      .select('DATE(shiftEgress.createdAt)', 'date')
+      .addSelect('SUM(shiftEgress.quantity)', 'quantity')
+      .where('shiftEgress.createdAt >= :thirtyDaysAgo', { thirtyDaysAgo })
+      .groupBy('DATE(shiftEgress.createdAt)')
+      .getRawMany();
+
+    return egressData.map((data) => ({
+      date: data.date.toISOString().split('T')[0],
+      quantity: parseInt(data.quantity, 10),
+    }));
+  }
+
   async registerEgress({ productId, warehouseId, quantity }: EgressBodyDto) {
     const [shift, product, warehouse, stock] = await Promise.all([
       this.getCurrentShift(),
@@ -61,7 +78,7 @@ export class ShiftsService {
       });
     });
     await this.productService.checkLowStocks([product.id]);
-    await this.productService.deleteStocksInZero()
+    await this.productService.deleteStocksInZero();
     return egress;
   }
 
