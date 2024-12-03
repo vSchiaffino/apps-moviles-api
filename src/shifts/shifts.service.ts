@@ -44,6 +44,7 @@ export class ShiftsService {
       .addSelect('SUM(shiftEgress.quantity)', 'quantity')
       .where('shiftEgress.createdAt >= :thirtyDaysAgo', { thirtyDaysAgo })
       .groupBy('DATE(shiftEgress.createdAt)')
+      .orderBy('DATE(shiftEgress.createdAt)', 'ASC')
       .getRawMany();
 
     return egressData.map((data) => ({
