@@ -214,8 +214,8 @@ export class ShiftsService {
   async notifyShiftChange(open: boolean) {
     this.shiftGateway.server.emit('shiftChange');
     this.notificationService.sendToAllUsers(
-      `Se ${open ? 'inicio' : 'termino'} un turno`,
-      `un turno ha sido ${open ? 'iniciado' : 'terminado'}`,
+      `Turno ${open ? 'Activo 🚨' : 'Terminado ✅'}`,
+      `El turno ha sido ${open ? 'iniciado' : 'terminado'}`,
     );
     this.productService.checkLowStocks();
   }

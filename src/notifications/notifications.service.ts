@@ -9,8 +9,8 @@ export class NotificationService {
     name: string;
     totalQuantity: number;
   }) {
-    const title = 'Stock bajo';
-    const body = `El producto ${product.name} tiene un stock de ${product.totalQuantity}`;
+    const title = 'Stock Bajo 🚨';
+    const body = `El producto ${product.name} tiene un stock de ${product.totalQuantity} unidades`;
     await this.sendToAllUsers(title, body);
   }
 
